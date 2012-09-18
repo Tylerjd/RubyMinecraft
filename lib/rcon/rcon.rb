@@ -124,7 +124,7 @@ module RCON
     # before commands can be sent.
     #
 
-    def initialize(host, port)
+    def initialize(host = 'localhost', port = 25575)
       @host = host
       @port = port
       @socket = nil
@@ -305,7 +305,7 @@ module RCON
     # before commands can be sent.
     #
 
-    def initialize(host, port)
+    def initialize(host = 'localhost', port = 25575)
       @host = host
       @port = port
       @socket = nil

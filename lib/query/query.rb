@@ -20,7 +20,7 @@ class Query
     end
   end
 
-  def self.simpleQuery(addr, port)
+  def self.simpleQuery(addr = 'localhost', port = 25565)
     @addr = addr
     @port = port
     init
