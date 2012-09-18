@@ -1,0 +1,4 @@
+class RubyMinecraft::RCON
+  
+  
+end
