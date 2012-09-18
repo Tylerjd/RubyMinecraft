@@ -1,8 +1,17 @@
-class RCON
+module RCON
+  
   class Packet
-    # placeholder so ruby doesn't bitch
+      # placeholder so ruby doesn't bitch
   end
+    
   class Query
+
+    #
+    # Convenience method to scrape input from cvar output and return that data.
+    # Returns integers as a numeric type if possible.
+    #
+    # ex: rcon.cvar("mp_friendlyfire") => 1
+    #
 
     def cvar(cvar_name)
       response = command(cvar_name)
@@ -15,9 +24,11 @@ class RCON
       end
     end
   end
-end
   
-  class RubyMinecraft::RCON::Packet::Source
+  class Packet
+  end
+  
+  class Packet::Source
     # execution command
     COMMAND_EXEC = 2
     # auth command
@@ -43,7 +54,7 @@ end
   
     #
     # Generate a command packet to be sent to an already
-    # authenticated RubyMinecraft::RCON connection. Takes the command as an
+    # authenticated RCon connection. Takes the command as an
     # argument.
     # 
     def command(string)
@@ -59,7 +70,7 @@ end
   
     #
     # Generate an authentication packet to be sent to a newly
-    # started RubyMinecraft::RCON connection. Takes the RubyMinecraft::RCON password as an
+    # started RCon connection. Takes the RCon password as an
     # argument.
     #
     def auth(string)
@@ -91,23 +102,9 @@ end
     end
 
   end
-  
-  #
-  # RubyMinecraft::RCON::Query::Source sends queries to a "Source" Engine server,
-  # such as Half-Life 2: Deathmatch, Counter-Strike: Source, or Day
-  # of Defeat: Source.
-  #
-  # Note that one authentication packet needs to be sent to send
-  # multiple commands. Sending multiple authentication packets may
-  # damage the current connection and require it to be reset.
-  #
-  # Note: If the attribute 'return_packets' is set to true, the full
-  # RubyMinecraft::RCON::Packet::Source object is returned, instead of just a string
-  # with the headers stripped. Useful for debugging.
-  #
 
-  class RubyMinecraft::RCON::Query::Source < RubyMinecraft::RCON::Query
-    # RubyMinecraft::RCON::Packet::Source object that was sent as a result of the last query
+  class Source < Query
+    # Packet::Source object that was sent as a result of the last query
     attr_reader :packet
     # TCPSocket object
     attr_reader :socket
@@ -122,7 +119,7 @@ end
   
     #
     # Given a host and a port (dotted-quad or hostname OK), creates
-    # a RubyMinecraft::RCON::Query::Source object. Note that this will still
+    # a Query::Source object. Note that this will still
     # require an authentication packet (see the auth() method)
     # before commands can be sent.
     #
@@ -137,7 +134,7 @@ end
     end
   
     #
-    # See RubyMinecraft::RCON::Query#cvar.
+    # See Query#cvar.
     # 
   
     def cvar(cvar_name)
@@ -149,7 +146,7 @@ end
     end
 
     #
-    # Sends a RubyMinecraft::RCON command to the server. May be used multiple times
+    # Sends a RCon command to the server. May be used multiple times
     # after an authentication is successful. 
     #
     # See the class-level documentation on the 'return_packet' attribute
@@ -160,17 +157,17 @@ end
     def command(command)
     
       if ! @authed
-        raise RubyMinecraft::RCON::NetworkException.new("You must authenticate the connection successfully before sending commands.")
+        raise NetworkException.new("You must authenticate the connection successfully before sending commands.")
       end
 
-      @packet = RubyMinecraft::RCON::Packet::Source.new
+      @packet = Packet::Source.new
       @packet.command(command)
 
       @socket.print @packet.to_s
       rpacket = build_response_packet
 
-      if rpacket.command_type != RubyMinecraft::RCON::Packet::Source::RESPONSE_NORM
-        raise RubyMinecraft::RCON::NetworkException.new("error sending command: #{rpacket.command_type}")
+      if rpacket.command_type != Packet::Source::RESPONSE_NORM
+        raise NetworkException.new("error sending command: #{rpacket.command_type}")
       end
 
       if @return_packets
@@ -181,7 +178,7 @@ end
     end
   
     #
-    # Requests authentication from the RubyMinecraft::RCON server, given a
+    # Requests authentication from the RCon server, given a
     # password. Is only expected to be used once.
     #
     # See the class-level documentation on the 'return_packet' attribute
@@ -192,7 +189,7 @@ end
     def auth(password)
       establish_connection
 
-      @packet = RubyMinecraft::RCON::Packet::Source.new
+      @packet = Packet::Source.new
       @packet.auth(password)
 
       @socket.print @packet.to_s
@@ -200,8 +197,8 @@ end
       rpacket = nil
       2.times { rpacket = build_response_packet }
 
-      if rpacket.command_type != RubyMinecraft::RCON::Packet::Source::RESPONSE_AUTH
-        raise RubyMinecraft::RCON::NetworkException.new("error authenticating: #{rpacket.command_type}")
+      if rpacket.command_type != Packet::Source::RESPONSE_AUTH
+        raise NetworkException.new("error authenticating: #{rpacket.command_type}")
       end
 
       @authed = true
@@ -229,11 +226,11 @@ end
     protected
   
     #
-    # Builds a RubyMinecraft::RCON::Packet::Source packet based on the response
+    # Builds a Packet::Source packet based on the response
     # given by the server. 
     #
     def build_response_packet
-      rpacket = RubyMinecraft::RCON::Packet::Source.new
+      rpacket = Packet::Source.new
       total_size = 0
       request_id = 0
       type = 0
@@ -287,9 +284,8 @@ end
   
   end
 
-
-  class RubyMinecraft::RCON::Query::Minecraft < RubyMinecraft::RCON::Query
-    # RubyMinecraft::RCON::Packet::Source object that was sent as a result of the last query
+  class Minecraft < Query
+    # Packet::Source object that was sent as a result of the last query
     attr_reader :packet
     # TCPSocket object
     attr_reader :socket
@@ -304,7 +300,7 @@ end
   
     #
     # Given a host and a port (dotted-quad or hostname OK), creates
-    # a RubyMinecraft::RCON::Query::Minecraft object. Note that this will still
+    # a Query::Minecraft object. Note that this will still
     # require an authentication packet (see the auth() method)
     # before commands can be sent.
     #
@@ -316,10 +312,10 @@ end
       @packet = nil
       @authed = false
       @return_packets = false
-    end
+   end
   
     #
-    # See RubyMinecraft::RCON::Query#cvar.
+    # See Query#cvar.
     # 
   
     def cvar(cvar_name)
@@ -331,7 +327,7 @@ end
     end
 
     #
-    # Sends a RubyMinecraft::RCON command to the server. May be used multiple times
+    # Sends a RCon command to the server. May be used multiple times
     # after an authentication is successful. 
     #
     # See the class-level documentation on the 'return_packet' attribute
@@ -342,17 +338,17 @@ end
     def command(command)
     
       if ! @authed
-        raise RubyMinecraft::RCON::NetworkException.new("You must authenticate the connection successfully before sending commands.")
+        raise NetworkException.new("You must authenticate the connection successfully before sending commands.")
       end
-
-      @packet = RubyMinecraft::RCON::Packet::Source.new
+    
+      @packet = Packet::Source.new
       @packet.command(command)
 
       @socket.print @packet.to_s
       rpacket = build_response_packet
 
-      if rpacket.command_type != RubyMinecraft::RCON::Packet::Source::RESPONSE_NORM
-        raise RubyMinecraft::RCON::NetworkException.new("error sending command: #{rpacket.command_type}")
+      if rpacket.command_type != Packet::Source::RESPONSE_NORM
+        raise NetworkException.new("error sending command: #{rpacket.command_type}")
       end
 
       if @return_packets
@@ -363,7 +359,7 @@ end
     end
   
     #
-    # Requests authentication from the RubyMinecraft::RCON server, given a
+    # Requests authentication from the RCon server, given a
     # password. Is only expected to be used once.
     #
     # See the class-level documentation on the 'return_packet' attribute
@@ -373,16 +369,16 @@ end
   
     def auth(password)
       establish_connection
-
-      @packet = RubyMinecraft::RCON::Packet::Source.new
+    
+      @packet = Packet::Source.new
       @packet.auth(password)
 
       @socket.print @packet.to_s
       rpacket = nil
       rpacket = build_response_packet
 
-      if rpacket.command_type != RubyMinecraft::RCON::Packet::Source::RESPONSE_AUTH
-        raise RubyMinecraft::RCON::NetworkException.new("error authenticating: #{rpacket.command_type}")
+      if rpacket.command_type != Packet::Source::RESPONSE_AUTH
+        raise NetworkException.new("error authenticating: #{rpacket.command_type}")
       end
 
       @authed = true
@@ -410,11 +406,11 @@ end
     protected
   
     #
-    # Builds a RubyMinecraft::RCON::Packet::Source packet based on the response
+    # Builds a Packet::Source packet based on the response
     # given by the server. 
     #
     def build_response_packet
-      rpacket = RubyMinecraft::RCON::Packet::Source.new
+      rpacket = Packet::Source.new
       total_size = 0
       request_id = 0
       type = 0
@@ -430,11 +426,6 @@ end
       tmp = @socket.recv(size[0])
       request_id, type, message, message2 = tmp.unpack("V1V1a*a*")
       total_size = size[0]
-      
-      #puts "size: "+size.to_s 
-      #puts "type: "+type.to_s
-      #puts "message: "+message
-      #puts "message2: "+message2
     
       rpacket.packet_size = total_size
       rpacket.request_id = request_id
@@ -457,7 +448,7 @@ end
   
   end
 
-  # Exception class for network errors
-  class RubyMinecraft::RCON::NetworkException < Exception
+  class NetworkException < Exception
   end
+
 end
