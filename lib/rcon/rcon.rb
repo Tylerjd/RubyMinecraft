@@ -1,8 +1,4 @@
 module RCON
-  
-  class Packet
-      # placeholder so ruby doesn't bitch
-  end
     
   class Query
 
@@ -149,10 +145,6 @@ module RCON
     # Sends a RCon command to the server. May be used multiple times
     # after an authentication is successful. 
     #
-    # See the class-level documentation on the 'return_packet' attribute
-    # for return values. The default is to return a string containing
-    # the response.
-    #
   
     def command(command)
     
@@ -180,10 +172,6 @@ module RCON
     #
     # Requests authentication from the RCon server, given a
     # password. Is only expected to be used once.
-    #
-    # See the class-level documentation on the 'return_packet' attribute
-    # for return values. The default is to return a true value if auth
-    # succeeded.
     #
   
     def auth(password)
@@ -330,10 +318,6 @@ module RCON
     # Sends a RCon command to the server. May be used multiple times
     # after an authentication is successful. 
     #
-    # See the class-level documentation on the 'return_packet' attribute
-    # for return values. The default is to return a string containing
-    # the response.
-    #
   
     def command(command)
     
@@ -362,10 +346,7 @@ module RCON
     # Requests authentication from the RCon server, given a
     # password. Is only expected to be used once.
     #
-    # See the class-level documentation on the 'return_packet' attribute
-    # for return values. The default is to return a true value if auth
-    # succeeded.
-    #
+
   
     def auth(password)
       establish_connection
