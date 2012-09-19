@@ -35,9 +35,55 @@ class Query
         end
       end
       return @val
-    rescue Timeout::Error
-      puts 'Timed Out!'
+    rescue StandardError => e
+      return false, e
     end
   end
   
+  def self.fullQuery(addr = 'localhost', port = 25565)
+    @addr = addr
+    @port = port
+    init
+    begin
+      timeout(5) do
+        query = @sock.send("\xFE\xFD\x00\x01\x02\x03\x04" + @key + "\x01\x02\x03\x04", 0)
+        data = @sock.recvfrom(1460)[0]
+        buffer = data[11...-1]
+        items, players = buffer.split("\x00\x00\x01player_\x00\x00")
+        if items[0...8] == 'hostname'
+          items = 'motd' + items[8...-1]
+        end
+        vals = {}
+        items = items.split("\x00")
+        items.each_with_index do |key, idx|
+          next unless idx % 2 == 0
+          vals[key] = items[idx + 1]
+        end
+
+        vals["motd"] = vals["hostname"]
+        vals.delete("hostname")
+        vals.delete("um") if vals["um"]
+
+        players = players[0..-2] if players
+        
+        if players
+          vals[:players] = players.split("\x00")
+        end
+        puts vals
+        vals["raw_plugins"] = vals["plugins"]
+        parts = vals["raw_plugins"].split(":")
+        server = parts[0].strip() if parts[0]
+        plugins = []
+        if parts.size == 2
+          plugins = parts[1].split(";").map {|value| value.strip() }
+        end
+        vals["plugins"] = plugins
+        vals["server"] = server
+        vals["timestamp"] = Time.now
+        return vals.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+      end
+    rescue StandardError => e
+      return false, e
+    end
+  end
 end

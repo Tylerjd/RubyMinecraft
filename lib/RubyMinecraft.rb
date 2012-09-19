@@ -1,4 +1,4 @@
-class RubyMinecraft
+module RubyMinecraft
   require 'socket'
   require 'timeout'
   
