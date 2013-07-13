@@ -1,5 +1,4 @@
 class Query
-
   def self.init
     @sock = UDPSocket.new
     @sock.connect(@addr,@port)
@@ -11,7 +10,7 @@ class Query
   def self.key
     begin
       timeout(5) do
-        start = @sock.send("\xFE\xFD\x09\x01\x02\x03\x04", 0)
+        start = @sock.send("\xFE\xFD\x09\x01\x02\x03\x04".force_encoding(Encoding::ASCII_8BIT), 0)
         t = @sock.recvfrom(1460)[0]
         key = t[5...-1].to_i
         @key = Array(key).pack('N')
@@ -28,7 +27,7 @@ class Query
     init
     begin
       timeout(2) do
-        query = @sock.send("\xFE\xFD\x00\x01\x02\x03\x04" + @key, 0)
+        query = @sock.send("\xFE\xFD\x00\x01\x02\x03\x04".force_encoding(Encoding::ASCII_8BIT) + @key, 0)
         data = @sock.recvfrom(1460)[0]
         buffer = data[5...-1]
         @val[:motd], @val[:gametype], @val[:map], @val[:numplayers], @val[:maxplayers], @buf = buffer.split("\x00", 6)
@@ -48,10 +47,10 @@ class Query
     init
     begin
       timeout(2) do
-        query = @sock.send("\xFE\xFD\x00\x01\x02\x03\x04" + @key + "\x01\x02\x03\x04", 0)
+        query = @sock.send("\xFE\xFD\x00\x01\x02\x03\x04".force_encoding(Encoding::ASCII_8BIT) + @key + "\x01\x02\x03\x04".force_encoding(Encoding::ASCII_8BIT), 0)
         data = @sock.recvfrom(1460)[0]
         buffer = data[11...-1]
-        items, players = buffer.split("\x00\x00\x01player_\x00\x00")
+        items, players = buffer.split("\x00\x00\x01player_\x00\x00".force_encoding(Encoding::ASCII_8BIT))
         if items[0...8] == 'hostname'
           items = 'motd' + items[8...-1]
         end
