@@ -9,7 +9,7 @@ class Query
   
   def self.key
     begin
-      timeout(5) do
+      timeout(1) do
         start = @sock.send("\xFE\xFD\x09\x01\x02\x03\x04".force_encoding(Encoding::ASCII_8BIT), 0)
         t = @sock.recvfrom(1460)[0]
         key = t[5...-1].to_i
@@ -26,7 +26,7 @@ class Query
     @port = port
     init
     begin
-      timeout(2) do
+      timeout(1) do
         query = @sock.send("\xFE\xFD\x00\x01\x02\x03\x04".force_encoding(Encoding::ASCII_8BIT) + @key, 0)
         data = @sock.recvfrom(1460)[0]
         buffer = data[5...-1]
@@ -37,7 +37,7 @@ class Query
       end
       return @val
     rescue StandardError => e
-      return false, e
+      return false
     end
   end
   
@@ -46,7 +46,7 @@ class Query
     @port = port
     init
     begin
-      timeout(2) do
+      timeout(1) do
         query = @sock.send("\xFE\xFD\x00\x01\x02\x03\x04".force_encoding(Encoding::ASCII_8BIT) + @key + "\x01\x02\x03\x04".force_encoding(Encoding::ASCII_8BIT), 0)
         data = @sock.recvfrom(1460)[0]
         buffer = data[11...-1]
@@ -84,7 +84,7 @@ class Query
         return vals.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
       end
     rescue StandardError => e
-      return false, e
+      return false
     end
   end
 end
