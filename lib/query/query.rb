@@ -1,4 +1,5 @@
 class Query
+
   def self.init
     @sock = UDPSocket.new
     @sock.connect(@addr,@port)
@@ -15,12 +16,11 @@ class Query
         key = t[5...-1].to_i
         @key = Array(key).pack('N')
       end
-    rescue Timeout::Error
-      return false
-    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+    rescue Timeout::Error, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
       return false
     end
   end
+
 
   def self.simpleQuery(addr = 'localhost', port = 25565)
     @addr = addr
@@ -38,7 +38,7 @@ class Query
       end
       return @val
     rescue StandardError => e
-      return false
+      return false, e
     end
   end
   
@@ -85,7 +85,7 @@ class Query
         return vals.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
       end
     rescue StandardError => e
-      return false
+      return false, e
     end
   end
 end
