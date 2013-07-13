@@ -1,4 +1,4 @@
-module RubyMinecraft
+module minecraft-query
   require 'socket'
   require 'timeout'
   
