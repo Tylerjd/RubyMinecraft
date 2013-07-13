@@ -16,7 +16,9 @@ class Query
         @key = Array(key).pack('N')
       end
     rescue Timeout::Error
-      puts 'Timed Out!'
+      return false
+    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+      return false
     end
   end
 
@@ -25,7 +27,7 @@ class Query
     @port = port
     init
     begin
-      timeout(5) do
+      timeout(2) do
         query = @sock.send("\xFE\xFD\x00\x01\x02\x03\x04" + @key, 0)
         data = @sock.recvfrom(1460)[0]
         buffer = data[5...-1]
@@ -45,7 +47,7 @@ class Query
     @port = port
     init
     begin
-      timeout(5) do
+      timeout(2) do
         query = @sock.send("\xFE\xFD\x00\x01\x02\x03\x04" + @key + "\x01\x02\x03\x04", 0)
         data = @sock.recvfrom(1460)[0]
         buffer = data[11...-1]

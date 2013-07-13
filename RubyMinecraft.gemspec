@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'RubyMinecraft'
-  s.version     = '0.0.2'
+  s.version     = '0.0.3'
   s.date        = '2013-07-12'
   s.summary     = "Ruby Minecraft lib"
   s.description = "A gem to retrieve data from a Minecraft server's query interface and manage a Minecraft or SRCDS server via RCON."
