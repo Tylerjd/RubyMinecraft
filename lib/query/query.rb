@@ -36,7 +36,7 @@ class Query
       end
       return @val
     rescue StandardError => e
-      return false, e
+      return false
     end
   end
   
@@ -83,7 +83,7 @@ class Query
         return vals.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
       end
     rescue StandardError => e
-      return false, e
+      return false
     end
   end
 end
