@@ -1,4 +1,4 @@
-module minecraft-query
+module MinecraftQuery
   require 'socket'
   require 'timeout'
   
